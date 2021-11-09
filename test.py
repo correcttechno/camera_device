@@ -4,6 +4,8 @@ import numpy as np
 import pytesseract
 import time
 from PIL import Image
+import multiprocessing as mp
+
 #from picamera.array import PiRGBArray
 #from picamera import PiCamera
 
@@ -30,7 +32,7 @@ while True:
         #cv2.imshow("Frame", image)
         key = cv2.waitKey(1) & 0xFF
         #rawCapture.truncate(0)
-        if key != ord("s") and say==20:
+        if True:
              say=0
              gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY) #convert to grey scale
              gray = cv2.bilateralFilter(gray, 11, 17, 17) #Blur to reduce noise
@@ -66,7 +68,7 @@ while True:
              
              #server.sendmail("Sender's Email ID@gmail.com","Sender's Email ID@gmail.com",text)
              
-             cv2.imshow("Frame",edged )
+             cv2.imshow("Frame",image )
              #cv2.waitKey(0)
              #break
 cv2.destroyAllWindows()
