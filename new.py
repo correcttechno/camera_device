@@ -25,9 +25,13 @@ print("axtarilir")
 #rawCapture = PiRGBArray(camera, size=(640, 480))
 
 camera = cv2.VideoCapture(0)
-camera.set(3, 640)
-camera.set(4, 480)
-ret,image
+camera.set(1, 320)
+camera.set(2, 240)
+
+camera.set(cv2.CAP_PROP_FPS, 10)
+fps = int(camera.get(5))
+print("fps:", fps)
+
 
 PAGE = """\
 <html>
@@ -36,13 +40,13 @@ PAGE = """\
 </head>
 <body>
 <center><h1>MSB Camera</h1></center>
-<center><img src="stream.mjpg" width="640" height="480"></center>
+<center><img style="object-fit:contain" src="stream.mjpg" width="640" height="480"></center>
 </body>
 </html>
 """
 
 
-def StartCamera(callback):
+def StartCamera(callback,self):
     #for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
     while True:
         ret, rawCapture = camera.read()
@@ -73,7 +77,7 @@ def StartCamera(callback):
 
             elif screenCnt is not None:
 
-                cv2.drawContours(image, [screenCnt], -1, (0, 255, 0), 3)
+                
                 mask = np.zeros(gray.shape, np.uint8)
                 new_image = cv2.drawContours(
                     mask,
@@ -93,22 +97,31 @@ def StartCamera(callback):
                         config=
                         '--psm 11 -c tessedit_char_whitelist=ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
                     )
-                    if (len(text) >= 7):
+                    if (len(text) > 6):
+                        cv2.drawContours(image, [screenCnt], -1, (0, 255, 0), 3)
                         print("Detected Number is:", text)
-                callback(image)            
-        return image
+                #cv2.imshow("Cropped", image)
+                callback(image,Cropped,self)            
+    
             
 
 ###
-def myfun(dat):
+def myfun(image,cropped,self):
+    image_bytes = cv2.imencode('.jpg', image)[1].tobytes()
+    #cv2.imshow("Frame",output)
+    #output = StreamingOutput()
+    if self!=False:
+        self.wfile.write(b'--FRAME\r\n')
+        self.send_header('Content-Type', 'image/jpeg')
+        self.send_header('Content-Length', len(image_bytes))
+        self.end_headers()
+        self.wfile.write(image_bytes)
+        self.wfile.write(b'\r\n')
+
     
-    cv2.imshow("Cropped", dat)
-    image=dat
     #Uncomment the next line to change your Pi's Camera rotation (in degrees)
     #camera.rotation = 90
-    address = ('', 8000)
-    server = StreamingServer(address, StreamingHandler)
-    server.serve_forever()
+
     
 
 
@@ -153,16 +166,10 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
                              'multipart/x-mixed-replace; boundary=FRAME')
             self.end_headers()
             try:
-                ret,img = camera.read()
-                image_bytes = cv2.imencode('.jpg', img)[1].tobytes()
-                #cv2.imshow("Frame",output)
-                #output = StreamingOutput()
-                self.wfile.write(b'--FRAME\r\n')
-                self.send_header('Content-Type', 'image/jpeg')
-                self.send_header('Content-Length', len(image_bytes))
-                self.end_headers()
-                self.wfile.write(image_bytes)
-                self.wfile.write(b'\r\n')
+                #ret,img = camera.read()
+                while True:
+                    StartCamera(myfun,self)
+                
                 #cv2.imshow("Frame",frame)
             except Exception as e:
                 logging.warning('Removed streaming client %s: %s',
@@ -178,11 +185,12 @@ class StreamingServer(socketserver.ThreadingMixIn, server.HTTPServer):
 
 
 
+#mp.Process(target=)
+while True:
+    address = ('', 8000)
+    server = StreamingServer(address, StreamingHandler)
+    server.serve_forever()
 
-while camera:
-    StartCamera(myfun)
-    
-    
 
 
 
