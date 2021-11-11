@@ -7,6 +7,7 @@ import time
 import logging
 import socketserver
 import base64
+from interface import MyHtml
 
 from threading import Condition
 from http import server
@@ -14,49 +15,48 @@ from http import server
 from PIL import Image
 import multiprocessing as mp
 
-#from picamera.array import PiRGBArray
-#from picamera import PiCamera
-
-print("axtarilir")
-
-#camera = PiCamera()
-#camera.resolution = (640, 480)
-#camera.framerate = 90
-#rawCapture = PiRGBArray(camera, size=(640, 480))
-
-camera = cv2.VideoCapture(0)
-camera.set(1, 320)
-camera.set(2, 240)
-
-camera.set(cv2.CAP_PROP_FPS, 10)
-fps = int(camera.get(5))
-print("fps:", fps)
+from picamera.array import PiRGBArray
+from picamera import PiCamera
 
 
-PAGE = """\
-<html>
-<head>
-<title>MSB Camera</title>
-</head>
-<body>
-<center><h1>MSB Camera</h1></center>
-<center><img style="object-fit:contain" src="stream.mjpg" width="640" height="480"></center>
-</body>
-</html>
-"""
 
+camera = PiCamera()
+camera.resolution = (640, 480)
+camera.framerate = 60
+camera.rotation=45
+rawCapture = PiRGBArray(camera, size=(640, 480))
+
+#camera = cv2.VideoCapture(0)
+#camera.set(1, 640)
+#camera.set(2, 480)
+
+#camera.set(cv2.CAP_PROP_FPS, 10)
+
+
+
+PAGE=MyHtml()
+CroppedImage=False
 
 def StartCamera(callback,self):
-    #for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
-    while True:
-        ret, rawCapture = camera.read()
-        image = rawCapture
+    thisTime=0;
+    say=0;
+    
+    Cropped=False
+    screenCnt = None
+    for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
+    #while True:
+        #ret, rawCapture = camera.read()
+        #image = rawCapture
         
-        #image = frame.array
+        image = frame.array
+        
         key = cv2.waitKey(1) & 0xFF
-        #rawCapture.truncate(0)
-        if True:
-
+        rawCapture.truncate(0)
+        if screenCnt is not None :
+            cv2.drawContours(image, [screenCnt], -1, (0, 255, 0), 3)
+        if time.time()-thisTime>1 :
+            say+=1
+            thisTime=time.time()
             gray = cv2.cvtColor(image,
                                 cv2.COLOR_BGR2GRAY)  #convert to grey scale
             gray = cv2.bilateralFilter(gray, 11, 17, 17)  #Blur to reduce noise
@@ -74,7 +74,6 @@ def StartCamera(callback,self):
                     break
             if screenCnt is None:
                 print("No contour detectedd")
-
             elif screenCnt is not None:
 
                 
@@ -91,7 +90,7 @@ def StartCamera(callback,self):
                 (topx, topy) = (np.min(x), np.min(y))
                 (bottomx, bottomy) = (np.max(x), np.max(y))
                 Cropped = gray[topx:bottomx + 1, topy:bottomy + 1]
-                for i in range(3, 14):
+                if True:
                     text = pytesseract.image_to_string(
                         Cropped,
                         config=
@@ -99,17 +98,21 @@ def StartCamera(callback,self):
                     )
                     if (len(text) > 6):
                         cv2.drawContours(image, [screenCnt], -1, (0, 255, 0), 3)
-                        print("Detected Number is:", text)
-                #cv2.imshow("Cropped", image)
-                callback(image,Cropped,self)            
+                        callback(image,Cropped,self) 
+                        print(say,"Detected Number is:", text)
+        
+        callback(image,Cropped,self)            
     
             
 
 ###
 def myfun(image,cropped,self):
     image_bytes = cv2.imencode('.jpg', image)[1].tobytes()
-    #cv2.imshow("Frame",output)
+    #cv2.imshow("Frame",cropped)
     #output = StreamingOutput()
+    global CroppedImage
+    CroppedImage=cropped
+    
     if self!=False:
         self.wfile.write(b'--FRAME\r\n')
         self.send_header('Content-Type', 'image/jpeg')
@@ -117,6 +120,10 @@ def myfun(image,cropped,self):
         self.end_headers()
         self.wfile.write(image_bytes)
         self.wfile.write(b'\r\n')
+        
+        
+        
+             
 
     
     #Uncomment the next line to change your Pi's Camera rotation (in degrees)
@@ -174,9 +181,27 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
             except Exception as e:
                 logging.warning('Removed streaming client %s: %s',
                                 self.client_address, str(e))
-        else:
-            self.send_error(404)
+        elif self.path == '/cropped.mjpg':
+            
+            self.send_response(200)
+            self.send_header('Age', 0)
+            self.send_header('Cache-Control', 'no-cache, private')
+            self.send_header('Pragma', 'no-cache')
+            self.send_header('Content-Type',
+                                 'multipart/x-mixed-replace; boundary=FRAME')
             self.end_headers()
+            while True:
+                global CroppedImage
+                image_bytes = cv2.imencode('.jpg', CroppedImage)[1].tobytes()
+                self.wfile.write(b'--FRAME\r\n')
+                self.send_header('Content-Type', 'image/jpeg')
+                self.send_header('Content-Length', len(image_bytes))
+                self.end_headers()
+                self.wfile.write(image_bytes)
+                self.wfile.write(b'\r\n')
+
+            
+        
 
 
 class StreamingServer(socketserver.ThreadingMixIn, server.HTTPServer):
@@ -185,12 +210,7 @@ class StreamingServer(socketserver.ThreadingMixIn, server.HTTPServer):
 
 
 
-#mp.Process(target=)
-while True:
-    address = ('', 8000)
-    server = StreamingServer(address, StreamingHandler)
-    server.serve_forever()
-
-
-
-
+address = ('', 8000)
+server = StreamingServer(address, StreamingHandler)
+server.serve_forever()
+    
