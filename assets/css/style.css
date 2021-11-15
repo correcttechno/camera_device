@@ -1,1 +1,55 @@
-dsd
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+* {
+    font-family: 'Roboto', sans-serif;
+}
+
+.login-body {
+    background-image: url(../img/4.png);
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+}
+
+.login-body .container {
+    height: 100vh;
+    padding-top: 100px;
+}
+
+.login-form {
+    vertical-align: top;
+    box-shadow: 0 0.1rem 0.7rem rgb(0 0 0 / 18%);
+    border: 1px solid rgba(0, 0, 0, 0);
+    margin-bottom: 30px;
+    background-color: rgb(0 0 0 / 0.24);
+    padding: 15px;
+    border-radius: 15px;
+}
+
+.form-item {
+    margin-top: 10px;
+}
+
+.form-item label {
+    color: #fff;
+    font-size: 12px;
+}
+
+.login-form-logo {
+    width: 100%;
+    object-fit: contain;
+    height: 100px;
+}
+
+.main {
+    width: 260px;
+    height: calc(100% - 70 px);
+    position: fixed;
+    top: 0px;
+    left: 0;
+    bottom: 0;
+    z-index: 16;
+    background: rgb(0 0 0 / 24%);
+    border-right: 1px solid rgb(255 255 255 / 14%);
+    box-shadow: none;
+    transition: all .2s ease-out;
+}
