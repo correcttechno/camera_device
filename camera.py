@@ -7,21 +7,21 @@ import pytesseract
 from PIL import Image
 import multiprocessing as mp
 import threading
-from picamera.array import PiRGBArray
-from picamera import PiCamera
+#from picamera.array import PiRGBArray
+#from picamera import PiCamera
 
 
 
-camera = PiCamera()
-camera.resolution = (640, 480)
-camera.framerate = 60
-rawCapture = PiRGBArray(camera, size=(640, 480))
+#camera = PiCamera()
+#camera.resolution = (640, 480)
+#camera.framerate = 60
+#rawCapture = PiRGBArray(camera, size=(640, 480))
 
-#camera = cv2.VideoCapture(0)
-#camera.set(1, 640)
-#camera.set(2, 480)
+camera = cv2.VideoCapture(0)
+camera.set(1, 640)
+camera.set(2, 480)
 
-#camera.set(cv2.CAP_PROP_FPS, 10)
+camera.set(cv2.CAP_PROP_FPS, 10)
 
 ScreenCnt = None
 Image=False
@@ -81,23 +81,24 @@ def ScanResults():
 
 
 def StartCamera(callback):
-    thisTime=0;
-    say=0;
+    thisTime=0
+    say=0
     global Image
     global RealTimeImage
     global Cropped
     global Text
     global ScreenCnt
-    for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
-    #while True:
-        #ret, rawCapture = camera.read()
-        #image = rawCapture
+    #for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
+    while True:
+        ret, rawCapture = camera.read()
+        Image = rawCapture
+        RealTimeImage=rawCapture
         
-        Image = frame.array
-        RealTimeImage=frame.array
+        #Image = frame.array
+        #RealTimeImage=frame.array
         
         key = cv2.waitKey(1) & 0xFF
-        rawCapture.truncate(0)
+        #rawCapture.truncate(0)
         
         if time.time()-thisTime>3 :
             say+=1

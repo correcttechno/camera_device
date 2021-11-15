@@ -85,6 +85,33 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
             self.send_header('Content-Length', len(content))
             self.end_headers()
             self.wfile.write(content)
+        elif self.path.find('/assets/')!=-1:
+            ifile = open(self.path.lstrip('/'),'rb')
+            content=ifile.read()
+            ifile.close()
+            
+            if(self.path.find('.css')):
+                conType='text/css'
+            if(self.path.find('.js')):
+                conType='text/javascript'
+            if(self.path.find('.png')):
+                conType='image/png'
+            if(self.path.find('.jpg')):
+                conType='image/jpeg'
+            if(self.path.find('.woff')):
+                conType='font/woff'
+            if(self.path.find('.ttf')):
+                conType='font/ttf'
+            if(self.path.find('.otf')):
+                conType='font/otf'
+            if(self.path.find('.html')):
+                conType='text/html'
+            
+            self.send_response(200)
+            self.send_header('Content-Type', conType)
+            self.send_header('Content-Length', len(content))
+            self.end_headers()
+            self.wfile.write(content)
         elif self.path == '/stream.mjpg':
             self.send_response(200)
             self.send_header('Age', 0)
