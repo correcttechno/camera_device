@@ -3198,11 +3198,22 @@ body.bg-theme12 {
 }
 
 .live-screen {
-	height: 100px;
 	width: 100%;
 	object-fit: contain;
 }
 
 .card-header h4 {
 	font-size: 14px;
+}
+
+.live-screen{
+	height: 400px;
+}
+
+.cr-screen{
+	height: 100px;
+}
+
+.sc-screen{
+	height: 200px;
 }

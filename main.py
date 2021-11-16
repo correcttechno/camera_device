@@ -16,7 +16,6 @@ import threading
 
 
 
-
 PAGE=MyHtml()
           
 
@@ -27,14 +26,17 @@ ScreenRealTime=False
 ###
 def myfun(image,cropped,text,realtime):
 
-    #cv2.imshow("Frame",image)
+    #cv2.imshow("Frame",realtime)
     #output = StreamingOutput()
     global CroppedImage
-    CroppedImage=cropped
+    if(cropped is not None):
+        CroppedImage=cropped
     global ScreenImage
-    ScreenImage=image
+    if(image is not None):
+        ScreenImage=image
     global ScreenRealTime
-    ScreenRealTime=realtime
+    if(realtime is not None):
+        ScreenRealTime=realtime
     
 def StartMyCamera():
     StartCamera(myfun)
@@ -90,21 +92,22 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
             content=ifile.read()
             ifile.close()
             
-            if(self.path.find('.css')):
+            conType=''
+            if(self.path.find('.css')!=-1):
                 conType='text/css'
-            if(self.path.find('.js')):
+            if(self.path.find('.js')!=-1):
                 conType='text/javascript'
-            if(self.path.find('.png')):
+            if(self.path.find('.png')!=-1):
                 conType='image/png'
-            if(self.path.find('.jpg')):
+            if(self.path.find('.jpg')!=-1):
                 conType='image/jpeg'
-            if(self.path.find('.woff')):
+            if(self.path.find('.woff')!=-1):
                 conType='font/woff'
-            if(self.path.find('.ttf')):
+            if(self.path.find('.ttf')!=-1):
                 conType='font/ttf'
-            if(self.path.find('.otf')):
+            if(self.path.find('.otf')!=-1):
                 conType='font/otf'
-            if(self.path.find('.html')):
+            if(self.path.find('.html')!=-1):
                 conType='text/html'
             
             self.send_response(200)

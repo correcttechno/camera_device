@@ -1,31 +1,36 @@
+import io
 import cv2
 import imutils
 import numpy as np
 import pytesseract
 import time
 from PIL import Image
-from picamera.array import PiRGBArray
-from picamera import PiCamera
-import RPi.GPIO as GPIO    # Import Raspberry Pi GPIO library
+#from picamera.array import PiRGBArray
+#from picamera import PiCamera
+#import RPi.GPIO as GPIO    # Import Raspberry Pi GPIO library
+amera = cv2.VideoCapture(0)
+camera.set(1, 640)
+camera.set(2, 480)
 
+camera.set(cv2.CAP_PROP_FPS, 10)
 
 print("axtarilir")
 
-camera = PiCamera()
-camera.resolution = (640, 480)
-camera.framerate = 90
-rawCapture = PiRGBArray(camera, size=(640, 480))
+#camera = PiCamera()
+#camera.resolution = (640, 480)
+#camera.framerate = 90
+#rawCapture = PiRGBArray(camera, size=(640, 480))
 
-GPIO.setwarnings(False)    # Ignore warning for now
-GPIO.setmode(GPIO.BCM)   # Use physical pin numbering
-GPIO.setup(23, GPIO.OUT)
-GPIO.output(23,GPIO.LOW)
+#GPIO.setwarnings(False)    # Ignore warning for now
+#GPIO.setmode(GPIO.BCM)   # Use physical pin numbering
+#GPIO.setup(23, GPIO.OUT)
+#GPIO.output(23,GPIO.LOW)
 
 
 say=0
-for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
-    
-
+  while True: 
+        ret, rawCapture = camera.read()
+        ScanImage = rawCapture
         say=say+1
         
         image = frame.array
@@ -74,4 +79,3 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
              #cv2.waitKey(0)
              #break
 cv2.destroyAllWindows()
-camera.close()
