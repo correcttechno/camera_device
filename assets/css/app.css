@@ -478,7 +478,7 @@ a:hover {
 
 .dashboard-social-list {
 	position: relative;
-	height: 230px;
+	height: 121px;
 }
 
 .dashboard-top-countries {
@@ -3216,4 +3216,9 @@ body.bg-theme12 {
 
 .sc-screen{
 	height: 200px;
+}
+
+.my-plate{
+	font-size: 12px;
+	letter-spacing: 1px;
 }

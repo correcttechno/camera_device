@@ -7,6 +7,8 @@ import time
 import logging
 import socketserver
 import base64
+from websocket_server import WebsocketServer
+
 from interface import MyHtml
 from camera import StartCamera
 
@@ -19,15 +21,23 @@ import threading
 PAGE=MyHtml()
           
 
-CroppedImage=False
-ScreenImage=False
-ScreenRealTime=False
+CroppedImage=None
+ScreenImage=None
+ScreenRealTime=None
+ScreenText=""
 
-###
+#start camera
 def myfun(image,cropped,text,realtime):
 
     #cv2.imshow("Frame",realtime)
     #output = StreamingOutput()
+    if text is not None and text!='':
+        global ScreenText
+        ScreenText=text
+        WebSocketSendMessage(text)
+        #print("Detected Number is:", ScreenText)
+
+
     global CroppedImage
     if(cropped is not None):
         CroppedImage=cropped
@@ -38,22 +48,18 @@ def myfun(image,cropped,text,realtime):
     if(realtime is not None):
         ScreenRealTime=realtime
     
+
 def StartMyCamera():
     StartCamera(myfun)
-        
+#end camera
+
+
+#http server
 def StartServer():
     print("Server basladi")
     address = ('', 8000)
     server = StreamingServer(address, StreamingHandler)
     server.serve_forever()
-             
-
-    
-    #Uncomment the next line to change your Pi's Camera rotation (in degrees)
-    #camera.rotation = 90
-
-    
-
 
 class StreamingOutput(object):
     def __init__(self):
@@ -176,13 +182,14 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
             self.end_headers()
             while True:
                 global CroppedImage
-                image_bytes = cv2.imencode('.jpg', CroppedImage)[1].tobytes()
-                self.wfile.write(b'--FRAME\r\n')
-                self.send_header('Content-Type', 'image/jpeg')
-                self.send_header('Content-Length', len(image_bytes))
-                self.end_headers()
-                self.wfile.write(image_bytes)
-                self.wfile.write(b'\r\n')
+                if(CroppedImage is not None):
+                    image_bytes = cv2.imencode('.jpg', CroppedImage)[1].tobytes()
+                    self.wfile.write(b'--FRAME\r\n')
+                    self.send_header('Content-Type', 'image/jpeg')
+                    self.send_header('Content-Length', len(image_bytes))
+                    self.end_headers()
+                    self.wfile.write(image_bytes)
+                    self.wfile.write(b'\r\n')
 
             
         
@@ -192,15 +199,34 @@ class StreamingServer(socketserver.ThreadingMixIn, server.HTTPServer):
     allow_reuse_address = True
     daemon_threads = True
     
+#end http server
 
 
+#websocket
+WsServer=None
+def NewWebSocketClient(client, server):
+    global WsServer
+    WsServer=server
+    global ScreenText
+    #server.send_message(client,"Salam")
 
-
-#x = threading.Thread(target=thread_function, args=(1,))
+thisTime=0
+def WebSocketSendMessage(msg):
+    global thisTime
+    if(len(msg)>6 and (time.time()-thisTime>1 )):
+        thisTime=time.time()
+        WsServer.send_message_to_all(msg)
+def StartWebSocket():
+    global WsServer
+    WsServer = WebsocketServer(host='', port=8082, loglevel=logging.INFO)
+    WsServer.set_fn_new_client(NewWebSocketClient)
+    WsServer.run_forever()
+#end websocket
 
 p1 = threading.Thread(target=StartServer)
 p2 = threading.Thread(target=StartMyCamera)
-
+p3 = threading.Thread(target=StartWebSocket)
 p1.start()
 p2.start()
+p3.start()
     

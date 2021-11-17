@@ -1,3 +1,7 @@
+from ip import *
+
+
+
 def MyHtml():
     PAGE = """\
   <!DOCTYPE html>
@@ -185,41 +189,11 @@ def MyHtml():
 
 											</div>
 										</div>
-										<div class="card-body">
+										<div class="card-body" style="padding-top:0">
 											<div class="dashboard-social-list">
-												<ul class="list-group list-group-flush">
-													<li class="list-group-item d-flex align-items-center bg-transparent">
-														<p class="mb-0">YouTube</p>														
-													</li>
-													<li class="list-group-item d-flex align-items-center bg-transparent">
-														<p class="mb-0">YouTube</p>														
-													</li>
-													<li class="list-group-item d-flex align-items-center bg-transparent">
-														<p class="mb-0">YouTube</p>														
-													</li>
-													<li class="list-group-item d-flex align-items-center bg-transparent">
-														<p class="mb-0">YouTube</p>														
-													</li>
-													<li class="list-group-item d-flex align-items-center bg-transparent">
-														<p class="mb-0">YouTube</p>														
-													</li>
-													<li class="list-group-item d-flex align-items-center bg-transparent">
-														<p class="mb-0">YouTube</p>														
-													</li>
-													<li class="list-group-item d-flex align-items-center bg-transparent">
-														<p class="mb-0">YouTube</p>														
-													</li>
-													<li class="list-group-item d-flex align-items-center bg-transparent">
-														<p class="mb-0">YouTube</p>														
-													</li>
-													<li class="list-group-item d-flex align-items-center bg-transparent">
-														<p class="mb-0">YouTube</p>														
-													</li><li class="list-group-item d-flex align-items-center bg-transparent">
-														<p class="mb-0">YouTube</p>														
-													</li>
-													<li class="list-group-item d-flex align-items-center bg-transparent">
-														<p class="mb-0">YouTube</p>														
-													</li>
+												<ul  class="list-group list-group-flush" id="lisence_plates">
+													
+													
 													
 												</ul>
 											</div>
@@ -275,12 +249,14 @@ def MyHtml():
 	<script src="/assets/plugins/metismenu/js/metisMenu.min.js"></script>
 	<script src="/assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js"></script>
 	<!-- Vector map JavaScript -->
-	<script src="/assets/plugins/vectormap/jquery-jvectormap-2.0.2.min.js"></script>
-	<script src="/assets/plugins/vectormap/jquery-jvectormap-world-mill-en.js"></script>
-	<script src="/assets/plugins/apexcharts-bundle/js/apexcharts.min.js"></script>
 	<script src="/assets/js/index.js"></script>
 	<!-- App JS -->
 	<script src="/assets/js/app.js"></script>
+	<script>
+		$('body').StartWebSocket('"""+getIp()+"""');
+		
+
+	</script>
 	<script>
 		new PerfectScrollbar('.dashboard-social-list');
 		new PerfectScrollbar('.dashboard-top-countries');

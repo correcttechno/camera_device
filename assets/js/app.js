@@ -180,6 +180,15 @@ $(function () {
     }
 });
 
-/* perfect scrol bar */
-new PerfectScrollbar('.header-message-list');
-new PerfectScrollbar('.header-notifications-list');
+
+
+$.fn.StartWebSocket=function(myip){
+	socket=new WebSocket('ws://'+myip+':8082')
+		socket.onopen=function(e){
+			console.log("Socket Connected");
+		}
+		socket.onmessage=function(e){
+			console.log(e.data)
+			$('#lisence_plates').prepend('<li class="d-flex my-plate align-items-center bg-transparent"><p class="mb-0">'+e.data+'</p></li>');
+		}
+}

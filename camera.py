@@ -24,7 +24,7 @@ camera.set(cv2.CAP_PROP_FPS, 10)
 
 ScreenCnt = None
 ScanImage=None
-Cropped=None
+CroppedImage=None
 Text=None
 RealTimeImage=None
 edged=None
@@ -32,7 +32,7 @@ edged=None
 def ScanResults():
     global ScanImage
     global RealTimeImage
-    global Cropped
+    global CroppedImage
     global Text
     global ScreenCnt
     global edged
@@ -49,6 +49,7 @@ def ScanResults():
             cnts = sorted(cnts, key=cv2.contourArea, reverse=True)[:10]
            
             ScreenCnt = None
+            Text=None
             for c in cnts:
                 peri = cv2.arcLength(c, True)
                 approx = cv2.approxPolyDP(c, 0.018 * peri, True)
@@ -79,10 +80,11 @@ def ScanResults():
                             '--psm 11 -c tessedit_char_whitelist=ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
                             )
 
-                        
+                        Text.replace(" ","")
+                        Text=Text.strip()
                         if len(Text)>6:
                             cv2.drawContours(ScanImage, [ScreenCnt], -1, (0, 255, 0), 3)
-                            print("Detected Number is:", Text)
+                            CroppedImage=Cropped
                        
                     
                     
@@ -91,11 +93,10 @@ def ScanResults():
 
 
 def StartCamera(callback):
-    thisTime=0
-    say=0
+    
     global ScanImage
     global RealTimeImage
-    global Cropped
+    global CroppedImage
     global Text
     global ScreenCnt
     #for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
@@ -120,4 +121,4 @@ def StartCamera(callback):
             
              
         
-        callback(ScanImage,Cropped,Text,RealTimeImage)  
+        callback(ScanImage,CroppedImage,Text,RealTimeImage)  
