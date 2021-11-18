@@ -5,7 +5,7 @@ import imutils
 import numpy as np
 import pytesseract
 import threading
-import easyocr
+import re
 #from picamera.array import PiRGBArray
 #from picamera import PiCamera
 
@@ -80,8 +80,7 @@ def ScanResults():
                             '--psm 11 -c tessedit_char_whitelist=ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
                             )
 
-                        Text.replace(" ","")
-                        Text=Text.strip()
+                        Text=re.sub('[^A-Za-z0-9]+', '', Text)
                         if len(Text)>6:
                             cv2.drawContours(ScanImage, [ScreenCnt], -1, (0, 255, 0), 3)
                             CroppedImage=Cropped
