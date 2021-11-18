@@ -81,7 +81,7 @@ def ScanResults():
                             )
 
                         Text=re.sub('[^A-Za-z0-9]+', '', Text)
-                        if True:
+                        if Text!="" and Text is not None:
                             cv2.drawContours(ScanImage, [ScreenCnt], -1, (0, 255, 0), 3)
                             CroppedImage=Cropped
                        
