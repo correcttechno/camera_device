@@ -182,7 +182,10 @@ $(function () {
 
 
 
+var ip_address=''
+
 $.fn.StartWebSocket=function(myip){
+	ip_address=myip
 	socket=new WebSocket('ws://'+myip+':8082')
 		socket.onopen=function(e){
 			console.log("Socket Connected");
@@ -192,3 +195,13 @@ $.fn.StartWebSocket=function(myip){
 			$('#lisence_plates').prepend('<li class="d-flex my-plate align-items-center bg-transparent"><p class="mb-0">'+e.data+'</p></li>');
 		}
 }
+
+
+$('#save_plate').click(function(){
+	var plate=$('#lisence_plate').val();
+	if(plate!=''){
+		$.post('/'+plate,{},function(e){
+			alert(e);
+		})
+	}
+})

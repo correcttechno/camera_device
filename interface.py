@@ -200,6 +200,22 @@ def MyHtml():
 										</div>
 									</div>
 								</div>
+								<div class="col-6 col-lg-6">
+									<div class="card radius-15">
+										<div class="card-header border-bottom-0">
+											<div class="d-lg-flex align-items-center">
+												<div>
+													<h4 class="mb-lg-0">Whitelist Plate</h4>
+												</div>
+
+											</div>
+										</div>
+										<div class="card-body">
+											<input type="text" id="lisence_plate"/>
+											<button id="save_plate">Save</button>
+										</div>
+									</div>
+								</div>
 							</div>
 						</div>
 						<div class="col-12 col-lg-7">

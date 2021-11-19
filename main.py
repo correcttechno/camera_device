@@ -25,7 +25,7 @@ CroppedImage=None
 ScreenImage=None
 ScreenRealTime=None
 ScreenText=""
-
+SavedPlate=None
 #start camera
 def myfun(image,cropped,text,realtime):
 
@@ -33,8 +33,12 @@ def myfun(image,cropped,text,realtime):
     #output = StreamingOutput()
     if text is not None and text!='':
         global ScreenText
+        global SavedPlate
         ScreenText=text
         WebSocketSendMessage(text)
+        if(SavedPlate is not None and (ScreenText.find(SavedPlate)!=-1)):
+            print("Opened")
+            print(SavedPlate)
         #print("Detected Number is:", ScreenText)
 
 
@@ -81,6 +85,16 @@ class StreamingOutput(object):
 
 class StreamingHandler(server.BaseHTTPRequestHandler):
     
+    def do_POST(self):
+        global SavedPlate
+        SavedPlate=self.path.lstrip('/')
+        response="Saved plate: "+SavedPlate
+        content = response.encode("utf-8")
+        self.send_response(200)
+        self.send_header('Content-Type', 'text/html')
+        self.send_header('Content-Length', len(content))
+        self.end_headers()
+        self.wfile.write(content)
     def do_GET(self):
         if self.path == '/':
             self.send_response(301)
