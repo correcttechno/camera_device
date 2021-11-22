@@ -84,6 +84,8 @@ def ScanResults():
                         if Text!="" and Text is not None and len(Text)>6:
                             cv2.drawContours(ScanImage, [ScreenCnt], -1, (0, 255, 0), 3)
                             CroppedImage=Cropped
+                        else:
+                            Text=None
                        
                     
                     

@@ -133,9 +133,6 @@ $(function () {
     $('#theme10').click(theme10);
     $('#theme11').click(theme11);
     $('#theme12').click(theme12);
-    $('#theme13').click(theme13);
-    $('#theme14').click(theme14);
-    $('#theme15').click(theme15);
 
     function theme1() {
       $('body').attr('class', 'bg-theme bg-theme1');
@@ -198,7 +195,9 @@ $.fn.StartWebSocket=function(myip){
 		}
 		socket.onmessage=function(e){
 			console.log(e.data)
-			$('#lisence_plates').prepend('<li class="d-flex my-plate align-items-center bg-transparent"><p class="mb-0">'+e.data+'</p></li>');
+
+			json=JSON.parse(e.data)
+			$('#lisence_plates').prepend('<li class="d-flex my-plate align-items-center bg-transparent"><p class="'+(json[1]==true?'text-success':'text-danger')+' mb-0">'+json[0]+'</p></li>');
 		}
 }
 

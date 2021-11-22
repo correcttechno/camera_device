@@ -7,25 +7,30 @@ import time
 import logging
 import socketserver
 import base64
+import json
 from websocket_server import WebsocketServer
-
-from interface import MyHtml
 from camera import StartCamera
-
 from http import server
 import multiprocessing as Process
 import threading
+import database 
+import textfilter
+
+from views.homeView import HomeView
+from views.whitelistView import WhitelistView
+from views.whitelistaddView import WhitelistaddView
 
 
 
-PAGE=MyHtml()
           
 
 CroppedImage=None
 ScreenImage=None
 ScreenRealTime=None
 ScreenText=""
-SavedPlate=None
+ScreenTextStatus=False
+
+
 #start camera
 def myfun(image,cropped,text,realtime):
 
@@ -33,12 +38,17 @@ def myfun(image,cropped,text,realtime):
     #output = StreamingOutput()
     if text is not None and text!='':
         global ScreenText
-        global SavedPlate
-        ScreenText=text
-        WebSocketSendMessage(text)
-        if(SavedPlate is not None and (ScreenText.find(SavedPlate)!=-1)):
-            print("Opened")
-            print(SavedPlate)
+        global ScreenTextStatus
+        ScreenText=textfilter.filter(text)
+
+        result=database.searchCar(ScreenText)
+        if(result):
+            ScreenTextStatus=True
+        else:
+            ScreenTextStatus=False
+
+        WSresponse=json.dumps([ScreenText,ScreenTextStatus])
+        WebSocketSendMessage(WSresponse)
         #print("Detected Number is:", ScreenText)
 
 
@@ -53,8 +63,8 @@ def myfun(image,cropped,text,realtime):
         ScreenRealTime=realtime
     
 
-def StartMyCamera():
-    StartCamera(myfun)
+#def StartMyCamera():
+    #StartCamera(myfun)
 #end camera
 
 
@@ -86,7 +96,7 @@ class StreamingOutput(object):
 class StreamingHandler(server.BaseHTTPRequestHandler):
     
     def do_POST(self):
-        global SavedPlate
+        SavedPlate=""
         SavedPlate=self.path.lstrip('/')
         response="Saved plate: "+SavedPlate
         content = response.encode("utf-8")
@@ -101,6 +111,23 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
             self.send_header('Location', '/index.html')
             self.end_headers()
         elif self.path == '/index.html':
+            PAGE=HomeView()
+            content = PAGE.encode('utf-8')
+            self.send_response(200)
+            self.send_header('Content-Type', 'text/html')
+            self.send_header('Content-Length', len(content))
+            self.end_headers()
+            self.wfile.write(content)
+        elif self.path == '/whitelist.html':
+            PAGE=WhitelistView()
+            content = PAGE.encode('utf-8')
+            self.send_response(200)
+            self.send_header('Content-Type', 'text/html')
+            self.send_header('Content-Length', len(content))
+            self.end_headers()
+            self.wfile.write(content)
+        elif self.path == '/whitelistadd.html':
+            PAGE=WhitelistaddView()
             content = PAGE.encode('utf-8')
             self.send_response(200)
             self.send_header('Content-Type', 'text/html')
@@ -238,9 +265,10 @@ def StartWebSocket():
 #end websocket
 
 p1 = threading.Thread(target=StartServer)
-p2 = threading.Thread(target=StartMyCamera)
+#p2 = threading.Thread(target=StartMyCamera)
+
 p3 = threading.Thread(target=StartWebSocket)
 p1.start()
-p2.start()
+#p2.start()
 p3.start()
-    
+StartCamera(myfun)
