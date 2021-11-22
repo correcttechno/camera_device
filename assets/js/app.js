@@ -1,5 +1,11 @@
 $(function () {
 	"use strict";
+	setTimeout(function(){
+		$('#realtime_stream').attr('src','/realtime.mjpg');
+		$('#cropped_stream').attr('src','/cropped.mjpg');
+		$('#_stream').attr('src','/stream.mjpg');
+	})
+	
 	// search bar
 	$(".search-btn-mobile").on("click", function () {
 		$(".search-bar").addClass("full-search-bar");

@@ -196,14 +196,14 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
             self.end_headers()
             while True:
                 global CroppedImage
-                if(CroppedImage is not None):
-                    image_bytes = cv2.imencode('.jpg', CroppedImage)[1].tobytes()
-                    self.wfile.write(b'--FRAME\r\n')
-                    self.send_header('Content-Type', 'image/jpeg')
-                    self.send_header('Content-Length', len(image_bytes))
-                    self.end_headers()
-                    self.wfile.write(image_bytes)
-                    self.wfile.write(b'\r\n')
+                
+                image_bytes = cv2.imencode('.jpg', CroppedImage)[1].tobytes()
+                self.wfile.write(b'--FRAME\r\n')
+                self.send_header('Content-Type', 'image/jpeg')
+                self.send_header('Content-Length', len(image_bytes))
+                self.end_headers()
+                self.wfile.write(image_bytes)
+                self.wfile.write(b'\r\n')
 
             
         

@@ -160,7 +160,7 @@ def MyHtml():
 											</div>
 										</div>
 										<div class="card-body">
-											<img class="live-screen sc-screen" src="/stream.mjpg" alt="Loading..."/>
+											<img id="_stream" class="live-screen sc-screen"  alt="Loading..."/>
 										</div>
 									</div>
 								</div>
@@ -175,7 +175,7 @@ def MyHtml():
 											</div>
 										</div>
 										<div class="card-body">
-											<img class="live-screen cr-screen" src="/cropped.mjpg" alt="Loading..."/>
+											<img id="cropped_stream" class="live-screen cr-screen"  alt="Loading..."/>
 										</div>
 									</div>
 								</div>
@@ -227,7 +227,7 @@ def MyHtml():
 										</div>
 									</div>
 									<div>
-										<img  class="live-screen l-screen" src="/realtime.mjpg" alt="Loading..."/>
+										<img id="realtime_stream"  class="live-screen l-screen"  alt="Loading..."/>
 									</div>
 								</div>
 
