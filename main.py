@@ -11,7 +11,8 @@ import json
 from websocket_server import WebsocketServer
 from camera import StartCamera
 from http import server
-import multiprocessing as Process
+import cgi
+
 import threading
 import database 
 import textfilter
@@ -96,9 +97,23 @@ class StreamingOutput(object):
 class StreamingHandler(server.BaseHTTPRequestHandler):
     
     def do_POST(self):
-        SavedPlate=""
-        SavedPlate=self.path.lstrip('/')
-        response="Saved plate: "+SavedPlate
+        form = cgi.FieldStorage(
+        fp=self.rfile,
+        headers=self.headers,
+        environ={
+            'REQUEST_METHOD': 'POST',
+            'CONTENT_TYPE': self.headers['Content-Type'],
+        })
+        response=""
+
+
+        if(self.path=="/addplate"):
+            database.addCar(form.getvalue('plate'))
+            response="Added plate "+form.getvalue('plate')
+        elif(self.path=="/deleteplate"):
+            database.deleteCar(form.getvalue('id'))
+            response="Deleted plate "
+
         content = response.encode("utf-8")
         self.send_response(200)
         self.send_header('Content-Type', 'text/html')

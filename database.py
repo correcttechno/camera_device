@@ -19,7 +19,7 @@ def SQLquery(sql):
 def addCar(plate):
     now = datetime.now()
     Nowdate = now.strftime("%d/%m/%Y %H:%M:%S")
-    sql="insert into cars('plate','addDate') values('"+plate+"','"+Nowdate+"')"
+    sql="insert into cars('plate','addDate') values('"+str(plate).upper()+"','"+Nowdate+"')"
     SQLquery(sql)
 
 def deleteCar(id):

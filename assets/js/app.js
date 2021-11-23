@@ -205,8 +205,18 @@ $.fn.StartWebSocket=function(myip){
 $('#save_plate').click(function(){
 	var plate=$('#lisence_plate').val();
 	if(plate!=''){
-		$.post('/'+plate,{},function(e){
+		$.post('/addplate',{'plate':plate},function(e){
 			alert(e);
+		})
+	}
+})
+
+$('.deleteplate[id]').click(function(){
+	var id=$(this).attr('id');
+	if(id!=''){
+		$.post('/deleteplate',{'id':id},function(e){
+			alert(e);
+			window.location.reload()
 		})
 	}
 })

@@ -5,7 +5,7 @@ def WhitelistView():
     result=""
     i=0
     for row in selectCars():
-        result+="<tr><td>"+str(i)+"</td><td>"+str(row[1])+"</td><td>"+str(row[2])+"</td><td></td></tr>"
+        result+="<tr><td>"+str(i)+"</td><td>"+str(row[1])+"</td><td>"+str(row[2])+"</td><td><button class='btn btn-sm btn-danger deleteplate' id='"+str(row[0])+"'><i class='bx bx-trash'></i></button></td></tr>"
         i+=1
 
     PAGE="""<div class="page-wrapper">
