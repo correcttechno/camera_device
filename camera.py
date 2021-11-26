@@ -28,6 +28,12 @@ CroppedImage=None
 Text=None
 RealTimeImage=None
 edged=None
+scanData="normal"
+
+def changeDisplay(dat):
+    global scanData
+    scanData=dat
+
 
 def ScanResults():
     global ScanImage
@@ -100,6 +106,7 @@ def StartCamera(callback):
     global CroppedImage
     global Text
     global ScreenCnt
+    global scanData
     #for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
     p3 = threading.Thread(target=ScanResults,daemon=False)
     p3.start()
@@ -121,5 +128,7 @@ def StartCamera(callback):
             #
             
              
-        
-        callback(ScanImage,CroppedImage,Text,RealTimeImage)  
+        if(scanData=="normal"):
+            callback(ScanImage,CroppedImage,Text,RealTimeImage)  
+        else:
+            callback(edged,CroppedImage,Text,RealTimeImage)  

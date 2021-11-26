@@ -16,6 +16,12 @@ def HomeView():
 												<div>
 													<h4 class="mb-lg-0">Real Time</h4>
 												</div>
+												<div class="col">
+													<select id="display_mode">
+														<option value="normal">Normal</option>
+														<option value="edged">Edged</option>
+													</select>
+												</div>
 
 											</div>
 										</div>

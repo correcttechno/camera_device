@@ -9,7 +9,7 @@ import socketserver
 import base64
 import json
 from websocket_server import WebsocketServer
-from camera import StartCamera
+from camera import StartCamera, changeDisplay
 from http import server
 import cgi
 
@@ -106,13 +106,15 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
         })
         response=""
 
-
         if(self.path=="/addplate"):
             database.addCar(form.getvalue('plate'))
             response="Added plate "+form.getvalue('plate')
         elif(self.path=="/deleteplate"):
             database.deleteCar(form.getvalue('id'))
             response="Deleted plate "
+        elif(self.path=="/changedisplay"):
+            changeDisplay(form.getvalue("mode"))
+            response="Success"
 
         content = response.encode("utf-8")
         self.send_response(200)

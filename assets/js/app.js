@@ -220,3 +220,9 @@ $('.deleteplate[id]').click(function(){
 		})
 	}
 })
+
+$('#display_mode').change(function(){
+	$.post('/changedisplay',{'mode':$(this).val()},function(e){
+		
+	})
+})
