@@ -9,10 +9,10 @@ import socketserver
 import base64
 import json
 from websocket_server import WebsocketServer
-from camera import StartCamera, changeDisplay
+from camera import StartCamera,changeDisplay
 from http import server
 import cgi
-
+import RPi.GPIO as GPIO
 import threading
 import database 
 import textfilter
@@ -21,6 +21,9 @@ from views.homeView import HomeView
 from views.whitelistView import WhitelistView
 from views.whitelistaddView import WhitelistaddView
 
+RELAY_PIN=23
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(RELAY_PIN, GPIO.OUT)
 
 
           
@@ -31,6 +34,8 @@ ScreenRealTime=None
 ScreenText=""
 ScreenTextStatus=False
 
+OpenedText=None
+OpenedDelay=0
 
 #start camera
 def myfun(image,cropped,text,realtime):
@@ -40,10 +45,25 @@ def myfun(image,cropped,text,realtime):
     if text is not None and text!='':
         global ScreenText
         global ScreenTextStatus
+        
+        global OpenedText
+        global OpenedDelay
+        global RELAY_PIN
+        
+        if(time.time()-OpenedDelay>20):
+                OpenedDelay=time.time()
+                OpenedText=None
+        
         ScreenText=textfilter.filter(text)
 
         result=database.searchCar(ScreenText)
-        if(result):
+        if(result  and ScreenText!=OpenedText):
+            ScreenTextStatus=True
+            GPIO.output(RELAY_PIN, GPIO.HIGH)
+            time.sleep(0.5)
+            GPIO.output(RELAY_PIN, GPIO.LOW)
+            OpenedText=ScreenText
+        elif result:
             ScreenTextStatus=True
         else:
             ScreenTextStatus=False
@@ -105,7 +125,7 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
             'CONTENT_TYPE': self.headers['Content-Type'],
         })
         response=""
-
+        
         if(self.path=="/addplate"):
             database.addCar(form.getvalue('plate'))
             response="Added plate "+form.getvalue('plate')
@@ -152,7 +172,7 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(content)
         elif self.path.find('/assets/')!=-1:
-            ifile = open(self.path.lstrip('/'),'rb')
+            ifile = open("/home/pi/camera_device/"+self.path.lstrip('/'),'rb')
             content=ifile.read()
             ifile.close()
             
@@ -240,14 +260,18 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
             self.end_headers()
             while True:
                 global CroppedImage
+                image_bytes=[0]
+                if(CroppedImage is not None):
+                    image_bytes = cv2.imencode('.jpg', CroppedImage)[1].tobytes()
                 
-                image_bytes = cv2.imencode('.jpg', CroppedImage)[1].tobytes()
+                    
                 self.wfile.write(b'--FRAME\r\n')
                 self.send_header('Content-Type', 'image/jpeg')
                 self.send_header('Content-Length', len(image_bytes))
                 self.end_headers()
-                self.wfile.write(image_bytes)
-                self.wfile.write(b'\r\n')
+                if(len(image_bytes)>10):
+                    self.wfile.write(image_bytes)
+                    self.wfile.write(b'\r\n')
 
             
         

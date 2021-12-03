@@ -6,21 +6,21 @@ import numpy as np
 import pytesseract
 import threading
 import re
-#from picamera.array import PiRGBArray
-#from picamera import PiCamera
+from picamera.array import PiRGBArray
+from picamera import PiCamera
 
 
 
-#camera = PiCamera()
-#camera.resolution = (640, 480)
-#camera.framerate = 60
-#rawCapture = PiRGBArray(camera, size=(640, 480))
+camera = PiCamera()
+camera.resolution = (1296, 976)
+camera.framerate = 30
+rawCapture = PiRGBArray(camera, size=(1296, 972))
 
-camera = cv2.VideoCapture(0)
-camera.set(1, 640)
-camera.set(2, 480)
+#camera = cv2.VideoCapture(0)
+#camera.set(1, 640)
+#camera.set(2, 480)
 
-camera.set(cv2.CAP_PROP_FPS, 10)
+#camera.set(cv2.CAP_PROP_FPS, 10)
 
 ScreenCnt = None
 ScanImage=None
@@ -28,12 +28,12 @@ CroppedImage=None
 Text=None
 RealTimeImage=None
 edged=None
+
 scanData="normal"
 
 def changeDisplay(dat):
     global scanData
     scanData=dat
-
 
 def ScanResults():
     global ScanImage
@@ -47,22 +47,24 @@ def ScanResults():
            
             ScanImage=RealTimeImage
             gray = cv2.cvtColor(ScanImage,cv2.COLOR_BGR2GRAY)  #convert to grey scale
-            gray = cv2.bilateralFilter(gray, 11, 17, 17)  #Blur to reduce noise
-            edged = cv2.Canny(gray, 30, 200)  #Perform Edge detection
+            gray = cv2.bilateralFilter(gray, 11, 17, 17)#Blur to reduce noise
+            #gray=cv2.morphologyEx(gray,cv2.MORPH_RECT,(3,3))
+            #gray=cv2.threshold(gray,0,255,cv2.THRESH_BINARY|cv2.THRESH_OTSU)[1]
+            edged = cv2.Canny(gray, 30, 500)  #Perform Edge detection
             cnts = cv2.findContours(edged.copy(), cv2.RETR_TREE,
                                             cv2.CHAIN_APPROX_SIMPLE)
             cnts = imutils.grab_contours(cnts)
             cnts = sorted(cnts, key=cv2.contourArea, reverse=True)[:10]
            
-            ScreenCnt = None
+            
             Text=None
             for c in cnts:
+                ScreenCnt = None
                 peri = cv2.arcLength(c, True)
                 approx = cv2.approxPolyDP(c, 0.018 * peri, True)
-                if len(approx) ==4:
+                applen=len(approx)
+                if applen==4:
                     ScreenCnt = approx
-                    
-                elif ScreenCnt is not None:
                     mask = np.zeros(gray.shape, np.uint8)
                     new_image = cv2.drawContours(
                     mask,
@@ -90,9 +92,10 @@ def ScanResults():
                         if Text!="" and Text is not None and len(Text)>6:
                             cv2.drawContours(ScanImage, [ScreenCnt], -1, (0, 255, 0), 3)
                             CroppedImage=Cropped
+                            
                         else:
                             Text=None
-                       
+                     
                     
                     
                 
@@ -107,19 +110,20 @@ def StartCamera(callback):
     global Text
     global ScreenCnt
     global scanData
-    #for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
+    
     p3 = threading.Thread(target=ScanResults,daemon=False)
     p3.start()
-    while True:
+    for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
+    #while True:
         key = cv2.waitKey(1) & 0xFF
-        ret, rawCapture = camera.read()
+        #ret, rawCapture = camera.read()
         RealTimeImage=rawCapture
         
         #ScanImage = frame.array
-        #RealTimeImage=frame.array
+        RealTimeImage=frame.array
         
         
-        #rawCapture.truncate(0)
+        rawCapture.truncate(0)
         
         #if time.time()-thisTime>2 :
             #say+=1
@@ -128,7 +132,8 @@ def StartCamera(callback):
             #
             
              
+        
         if(scanData=="normal"):
             callback(ScanImage,CroppedImage,Text,RealTimeImage)  
         else:
-            callback(edged,CroppedImage,Text,RealTimeImage)  
+            callback(edged,CroppedImage,Text,RealTimeImage)

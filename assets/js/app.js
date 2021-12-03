@@ -193,11 +193,12 @@ $.fn.StartWebSocket=function(myip){
 		socket.onopen=function(e){
 			console.log("Socket Connected");
 		}
+		var say=0;
 		socket.onmessage=function(e){
 			console.log(e.data)
-
+			say++;
 			json=JSON.parse(e.data)
-			$('#lisence_plates').prepend('<li class="d-flex my-plate align-items-center bg-transparent"><p class="'+(json[1]==true?'text-success':'text-danger')+' mb-0">'+json[0]+'</p></li>');
+			$('#lisence_plates').prepend('<li class="d-flex my-plate align-items-center bg-transparent"><p class="'+(json[1]==true?'text-success':'text-danger')+' mb-0">'+say+"| "+json[0]+'</p></li>');
 		}
 }
 

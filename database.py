@@ -7,7 +7,7 @@ from datetime import datetime
 
 def SQLquery(sql):
     
-    con = sqlite3.connect('database/database.db')
+    con = sqlite3.connect('/home/pi/camera_device/database/database.db')
     
     cur = con.cursor()
     cur.execute(sql)
