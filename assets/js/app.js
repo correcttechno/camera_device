@@ -227,3 +227,31 @@ $('#display_mode').change(function(){
 		
 	})
 })
+
+
+$('#save_api').click(function(){
+	var request_url=$('#request_url').val();
+
+	var plate=0,date=0,scaned_image=0,cropped_image=0;
+
+	if($('#plate').prop('checked'))
+	plate=$('#plate').val();
+	if($('#date').prop('checked'))
+	date=$('#date').val();
+	if($('#scaned_image').prop('checked'))
+	scaned_image=$('#scaned_image').val();
+	if($('#cropped_image').prop('checked'))
+	cropped_image=$('#cropped_image').val();
+
+	$.post('/saveapi',
+	{
+		'request_url':request_url,
+		'plate':plate,
+		'date':date,
+		'scaned_image':scaned_image,
+		'cropped_image':cropped_image
+	}
+	,function(e){
+		alert(e);
+	})
+})

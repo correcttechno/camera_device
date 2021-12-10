@@ -42,7 +42,7 @@ def MenuView():
 					</a>
 				</li>
 				<li>
-					<a href="contact-list.html">
+					<a href="api.html">
 						<div class="parent-icon"><i class="bx bx-server"></i>
 						</div>
 						<div class="menu-title">Api</div>

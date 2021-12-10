@@ -6,21 +6,21 @@ import numpy as np
 import pytesseract
 import threading
 import re
-from picamera.array import PiRGBArray
-from picamera import PiCamera
+#from picamera.array import PiRGBArray
+#from picamera import PiCamera
 
 
 
-camera = PiCamera()
-camera.resolution = (1296, 976)
-camera.framerate = 30
-rawCapture = PiRGBArray(camera, size=(1296, 972))
+#camera = PiCamera()
+#camera.resolution = (1296, 976)
+#camera.framerate = 30
+#rawCapture = PiRGBArray(camera, size=(1296, 972))
 
-#camera = cv2.VideoCapture(0)
-#camera.set(1, 640)
-#camera.set(2, 480)
+camera = cv2.VideoCapture(0)
+camera.set(1, 1296)
+camera.set(2, 972)
 
-#camera.set(cv2.CAP_PROP_FPS, 10)
+camera.set(cv2.CAP_PROP_FPS, 30)
 
 ScreenCnt = None
 ScanImage=None
@@ -116,17 +116,17 @@ def StartCamera(callback):
     
     p3 = threading.Thread(target=ScanResults,daemon=False)
     p3.start()
-    for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
-    #while True:
+    #for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
+    while True:
         key = cv2.waitKey(1) & 0xFF
-        #ret, rawCapture = camera.read()
+        ret, rawCapture = camera.read()
         RealTimeImage=rawCapture
         
         #ScanImage = frame.array
-        RealTimeImage=frame.array
+        #RealTimeImage=frame.array
         
         
-        rawCapture.truncate(0)
+        #rawCapture.truncate(0)
         
         #if time.time()-thisTime>2 :
             #say+=1

@@ -12,18 +12,20 @@ from websocket_server import WebsocketServer
 from camera import StartCamera,changeDisplay
 from http import server
 import cgi
-import RPi.GPIO as GPIO
+#import RPi.GPIO as GPIO
 import threading
-import database 
+import database
+from network import checkNetwork 
 import textfilter
+from views.apiView import ApiView
 
 from views.homeView import HomeView
 from views.whitelistView import WhitelistView
 from views.whitelistaddView import WhitelistaddView
 
 RELAY_PIN=23
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(RELAY_PIN, GPIO.OUT)
+#GPIO.setmode(GPIO.BCM)
+#GPIO.setup(RELAY_PIN, GPIO.OUT)
 
 
           
@@ -40,6 +42,16 @@ OpenedDelay=0
 #start camera
 def myfun(image,cropped,text,realtime):
 
+    global CroppedImage
+    if(cropped is not None):
+        CroppedImage=cropped
+    global ScreenImage
+    if(image is not None):
+        ScreenImage=image
+    global ScreenRealTime
+    if(realtime is not None):
+        ScreenRealTime=realtime 
+        
     #cv2.imshow("Frame",realtime)
     #output = StreamingOutput()
     if text is not None and text!='':
@@ -58,11 +70,12 @@ def myfun(image,cropped,text,realtime):
         ScreenText=textfilter.filter(text)
 
         result=database.searchCar(ScreenText)
-        if(result  and ScreenText!=OpenedText):
+        network=checkNetwork(ScreenText,ScreenImage,CroppedImage)
+        if((result or network)  and ScreenText!=OpenedText):
             ScreenTextStatus=True
-            GPIO.output(RELAY_PIN, GPIO.HIGH)
+            #GPIO.output(RELAY_PIN, GPIO.HIGH)
             time.sleep(0.5)
-            GPIO.output(RELAY_PIN, GPIO.LOW)
+            #GPIO.output(RELAY_PIN, GPIO.LOW)
             OpenedText=ScreenText
         elif result:
             ScreenTextStatus=True
@@ -74,15 +87,7 @@ def myfun(image,cropped,text,realtime):
         #print("Detected Number is:", ScreenText)
 
 
-    global CroppedImage
-    if(cropped is not None):
-        CroppedImage=cropped
-    global ScreenImage
-    if(image is not None):
-        ScreenImage=image
-    global ScreenRealTime
-    if(realtime is not None):
-        ScreenRealTime=realtime
+    
     
 
 #def StartMyCamera():
@@ -136,6 +141,9 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
         elif(self.path=="/changedisplay"):
             changeDisplay(form.getvalue("mode"))
             response="Success"
+        elif(self.path=="/saveapi"):
+            database.editApi(form.getvalue("request_url"),form.getvalue("plate"),form.getvalue("date"),form.getvalue("scaned_image"),form.getvalue("cropped_image"))
+            response="Success"
 
         content = response.encode("utf-8")
         self.send_response(200)
@@ -172,8 +180,16 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
             self.send_header('Content-Length', len(content))
             self.end_headers()
             self.wfile.write(content)
+        elif self.path == '/api.html':
+            PAGE=ApiView()
+            content = PAGE.encode('utf-8')
+            self.send_response(200)
+            self.send_header('Content-Type', 'text/html')
+            self.send_header('Content-Length', len(content))
+            self.end_headers()
+            self.wfile.write(content)
         elif self.path.find('/assets/')!=-1:
-            ifile = open("/home/pi/camera_device/"+self.path.lstrip('/'),'rb')
+            ifile = open(self.path.lstrip('/'),'rb')
             content=ifile.read()
             ifile.close()
             
