@@ -42,9 +42,12 @@ def ScanResults():
     global Text
     global ScreenCnt
     global edged
+    thisTime=0
     while True:
-        if(RealTimeImage is not None ):
-           
+        
+            
+        if(RealTimeImage is not None and time.time()-thisTime>2):
+            thisTime=time.time()
             ScanImage=RealTimeImage
             gray = cv2.cvtColor(ScanImage,cv2.COLOR_BGR2GRAY)  #convert to grey scale
             gray = cv2.bilateralFilter(gray, 11, 17, 17)#Blur to reduce noise

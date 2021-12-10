@@ -50,7 +50,8 @@ def myfun(image,cropped,text,realtime):
         global OpenedDelay
         global RELAY_PIN
         
-        if(time.time()-OpenedDelay>20):
+        #if(True):
+        if(time.time()-OpenedDelay>10):
                 OpenedDelay=time.time()
                 OpenedText=None
         
