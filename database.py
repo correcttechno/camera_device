@@ -52,6 +52,8 @@ def searchCar(plate):
 #api functions
 
 def editApi(request_url,plate,date,scaned_image,cropped_image):
+    if(request_url is None):
+        request_url=''
     sql="update settings set value='"+request_url+"' where key='api_request_url'"
     SQLquery(sql)
 
@@ -89,6 +91,6 @@ def readApiSettings():
             scaned_image=row[2]
         elif(row[1]=='api_cropped_image' and row[2]=='1'):
             cropped_image=row[2]
-    return [
-        request_url,plate,date,scaned_image,cropped_image
-    ]
+    return {
+        'request_url':request_url,'plate':plate,'date':date,'scaned_image':scaned_image,'cropped_image':cropped_image
+    }

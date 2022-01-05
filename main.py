@@ -151,6 +151,9 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
         self.send_header('Content-Length', len(content))
         self.end_headers()
         self.wfile.write(content)
+
+
+        
     def do_GET(self):
         if self.path == '/':
             self.send_response(301)
