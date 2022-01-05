@@ -255,3 +255,15 @@ $('#save_api').click(function(){
 		alert(e);
 	})
 })
+
+
+$('#login_btn').click(function(){
+	var username=$('#username').val();
+	var password=$('#password').val();
+	$.post('/setlogin',{
+		'username':username,
+		'password':password
+	},function(e){
+		
+	});
+})

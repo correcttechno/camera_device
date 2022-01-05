@@ -1,5 +1,6 @@
 import sqlite3
 from datetime import datetime
+import hashlib
 
 
 
@@ -94,3 +95,15 @@ def readApiSettings():
     return {
         'request_url':request_url,'plate':plate,'date':date,'scaned_image':scaned_image,'cropped_image':cropped_image
     }
+
+
+def setLogin(username,password):
+    sql="select * from settings where key='login_username'"
+    seluser=SQLquery(sql).fetchone()[2]
+    sql="select * from settings where key='login_password'"
+    selpass=SQLquery(sql).fetchone()[2]
+
+    if(seluser==username and selpass==password):
+        return True
+    else:
+        return False

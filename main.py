@@ -20,6 +20,7 @@ import textfilter
 from views.apiView import ApiView
 
 from views.homeView import HomeView
+from views.loginView import LoginView
 from views.whitelistView import WhitelistView
 from views.whitelistaddView import WhitelistaddView
 
@@ -144,7 +145,9 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
         elif(self.path=="/saveapi"):
             database.editApi(form.getvalue("request_url"),form.getvalue("plate"),form.getvalue("date"),form.getvalue("scaned_image"),form.getvalue("cropped_image"))
             response="Success"
-
+        elif(self.path=="/setlogin"):
+            database.setLogin(form.getvalue('username'),form.getvalue('password'))
+            response="Success"
         content = response.encode("utf-8")
         self.send_response(200)
         self.send_header('Content-Type', 'text/html')
@@ -153,7 +156,7 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
         self.wfile.write(content)
 
 
-        
+
     def do_GET(self):
         if self.path == '/':
             self.send_response(301)
@@ -185,6 +188,14 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
             self.wfile.write(content)
         elif self.path == '/api.html':
             PAGE=ApiView()
+            content = PAGE.encode('utf-8')
+            self.send_response(200)
+            self.send_header('Content-Type', 'text/html')
+            self.send_header('Content-Length', len(content))
+            self.end_headers()
+            self.wfile.write(content)
+        elif self.path == '/login.html':
+            PAGE=LoginView()
             content = PAGE.encode('utf-8')
             self.send_response(200)
             self.send_header('Content-Type', 'text/html')
