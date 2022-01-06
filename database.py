@@ -1,7 +1,7 @@
 import sqlite3
 from datetime import datetime
 import hashlib
-
+import random
 
 
 
@@ -104,6 +104,15 @@ def setLogin(username,password):
     selpass=SQLquery(sql).fetchone()[2]
 
     if(seluser==username and selpass==password):
-        return True
+        uid=round(random.random()*100000)
+        sql="update settings set value='"+str(uid)+"' where key='login_token'"
+        SQLquery(sql)
+        return str(uid)
     else:
         return False
+
+
+def getToken(url):
+    sql="select value from settings where key='login_token'"
+    result=SQLquery(sql)
+    return url+"?token="+result.fetchone()[0]

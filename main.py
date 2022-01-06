@@ -146,8 +146,11 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
             database.editApi(form.getvalue("request_url"),form.getvalue("plate"),form.getvalue("date"),form.getvalue("scaned_image"),form.getvalue("cropped_image"))
             response="Success"
         elif(self.path=="/setlogin"):
-            database.setLogin(form.getvalue('username'),form.getvalue('password'))
-            response="Success"
+            uid=database.setLogin(form.getvalue('username'),form.getvalue('password'))
+            if(uid!=False):
+                response='{"status":true,"msg":"Welcome","uid":'+uid+'}'
+            else:
+                response='{"status":"false","msg":"Account not found"}'
         content = response.encode("utf-8")
         self.send_response(200)
         self.send_header('Content-Type', 'text/html')
@@ -158,11 +161,11 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
 
 
     def do_GET(self):
-        if self.path == '/':
+        if self.path =='/':
             self.send_response(301)
-            self.send_header('Location', '/index.html')
+            self.send_header('Location', '/login.html')
             self.end_headers()
-        elif self.path == '/index.html':
+        elif self.path == database.getToken('/index.html'):
             PAGE=HomeView()
             content = PAGE.encode('utf-8')
             self.send_response(200)
@@ -170,7 +173,7 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
             self.send_header('Content-Length', len(content))
             self.end_headers()
             self.wfile.write(content)
-        elif self.path == '/whitelist.html':
+        elif self.path == database.getToken('/whitelist.html'):
             PAGE=WhitelistView()
             content = PAGE.encode('utf-8')
             self.send_response(200)
@@ -178,7 +181,7 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
             self.send_header('Content-Length', len(content))
             self.end_headers()
             self.wfile.write(content)
-        elif self.path == '/whitelistadd.html':
+        elif self.path == database.getToken('/whitelistadd.html'):
             PAGE=WhitelistaddView()
             content = PAGE.encode('utf-8')
             self.send_response(200)
@@ -186,7 +189,7 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
             self.send_header('Content-Length', len(content))
             self.end_headers()
             self.wfile.write(content)
-        elif self.path == '/api.html':
+        elif self.path == database.getToken('/api.html'):
             PAGE=ApiView()
             content = PAGE.encode('utf-8')
             self.send_response(200)
@@ -194,7 +197,7 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
             self.send_header('Content-Length', len(content))
             self.end_headers()
             self.wfile.write(content)
-        elif self.path == '/login.html':
+        elif self.path == ('/login.html'):
             PAGE=LoginView()
             content = PAGE.encode('utf-8')
             self.send_response(200)
@@ -230,7 +233,7 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
             self.send_header('Content-Length', len(content))
             self.end_headers()
             self.wfile.write(content)
-        elif self.path == '/stream.mjpg':
+        elif self.path == database.getToken('/stream.mjpg'):
             self.send_response(200)
             self.send_header('Age', 0)
             self.send_header('Cache-Control', 'no-cache, private')
@@ -255,7 +258,7 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
             except Exception as e:
                 logging.warning('Removed streaming client %s: %s',
                                 self.client_address, str(e))
-        elif self.path == '/realtime.mjpg':
+        elif self.path == database.getToken('/realtime.mjpg'):
             self.send_response(200)
             self.send_header('Age', 0)
             self.send_header('Cache-Control', 'no-cache, private')
@@ -280,7 +283,7 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
             except Exception as e:
                 logging.warning('Removed streaming client %s: %s',
                                 self.client_address, str(e))
-        elif self.path == '/cropped.mjpg':
+        elif self.path == database.getToken('/cropped.mjpg'):
             
             self.send_response(200)
             self.send_header('Age', 0)

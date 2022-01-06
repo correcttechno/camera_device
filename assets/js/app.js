@@ -1,10 +1,6 @@
 $(function () {
 	"use strict";
-	setTimeout(function(){
-		$('#realtime_stream').attr('src','/realtime.mjpg');
-		$('#cropped_stream').attr('src','/cropped.mjpg');
-		$('#_stream').attr('src','/stream.mjpg');
-	})
+	
 	
 	// search bar
 	$(".search-btn-mobile").on("click", function () {
@@ -29,6 +25,7 @@ $(function () {
 		});
 	});
 	$(function () {
+		if($('.metismenu-card').html()!=undefined)
 		$('.metismenu-card').metisMenu({
 			toggle: false,
 			triggerElement: '.card-header',
@@ -38,10 +35,12 @@ $(function () {
 	});
 	// Tooltips 
 	$(function () {
+		if($('[data-toggle="tooltip"]').html()!=undefined)
 		$('[data-toggle="tooltip"]').tooltip()
 	})
 	// Metishmenu card collapse
 	$(function () {
+		if($('.card-collapse').html()!=undefined)
 		$('.card-collapse').metisMenu({
 			toggle: false,
 			triggerElement: '.card-header',
@@ -99,7 +98,8 @@ $(function () {
 	}),
 	// metismenu
 	$(function () {
-		$('#menu').metisMenu();
+		if($('#menu').html()!=undefined)
+			$('#menu').metisMenu();
 	});
 	/* Back To Top */
 	$(document).ready(function () {
@@ -260,10 +260,39 @@ $('#save_api').click(function(){
 $('#login_btn').click(function(){
 	var username=$('#username').val();
 	var password=$('#password').val();
-	$.post('/setlogin',{
+	
+	$.ajax({
+		url:'/setlogin',
+		data:{
 		'username':username,
 		'password':password
-	},function(e){
-		
+		},
+		dataType:'Json',
+		type:'post',
+		success:function(myjson){
+			console.log(myjson);
+			if(myjson.status==true){
+				localStorage.setItem('uid',myjson.uid);
+				window.location.href="/index.html?token="+myjson.uid;
+			}
+			else{
+				$('#msg').html(myjson.msg);
+			}
+		},
 	});
+})
+
+
+$(function(){
+	var token=localStorage.getItem('uid');
+	if(token!=null && token!=undefined){
+		$.each($('a'),function(index,val){
+			$('a').eq(index).attr('href',val+'?token='+token);
+		})
+		setTimeout(function(){
+			$('#realtime_stream').attr('src','/realtime.mjpg?token='+token);
+			$('#cropped_stream').attr('src','/cropped.mjpg?token='+token);
+			$('#_stream').attr('src','/stream.mjpg?token='+token);
+		})
+	}
 })

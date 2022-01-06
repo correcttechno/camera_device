@@ -24,8 +24,9 @@ def LoginView():
 										<label>Password</label>
 										<input id="password" type="password" class="form-control" placeholder="Enter your password" />
 									</div>
-									
+									<div id="msg"></div>
 									<div class="btn-group mt-3 w-100">
+										
 										<button id="login_btn" type="button" class="btn btn-light btn-block">
                                             Log In
 										</button>
