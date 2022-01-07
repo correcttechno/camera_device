@@ -282,9 +282,8 @@ $('#login_btn').click(function(){
 	});
 })
 
-
+var token=localStorage.getItem('uid');
 $(function(){
-	var token=localStorage.getItem('uid');
 	if(token!=null && token!=undefined){
 		$.each($('a'),function(index,val){
 			$('a').eq(index).attr('href',val+'?token='+token);
@@ -294,5 +293,24 @@ $(function(){
 			$('#cropped_stream').attr('src','/cropped.mjpg?token='+token);
 			$('#_stream').attr('src','/stream.mjpg?token='+token);
 		})
+	}
+})
+
+
+$('#save_password').click(function(){
+	var password=$('#password').val();
+	var retrypassword=$('#retrypassword').val();
+	if(password!='' && retrypassword!='' && (password==retrypassword)){
+		$.post('/setrootpassword',{
+			'password':password,
+			'token':token
+		},function(e){
+			$('#password').val('');
+			$('#retrypassword').val('');
+			$('#msg').html(e);
+		});
+	}
+	else{
+		$('#msg').html("Passwords are not the same");
 	}
 })

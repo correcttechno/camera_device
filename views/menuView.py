@@ -22,7 +22,8 @@ def MenuView():
 				</li>
 				<li>
 					<a class="has-arrow" href="javascript:;" >
-						<div class="parent-icon"> <i class="bx bx-list-ul"></i>
+						<div class="parent-icon"> 
+							<i class="bx bx-list-ul"></i>
 						</div>
 						<div class="menu-title">White List</div>
 					</a>
@@ -35,11 +36,18 @@ def MenuView():
 					</ul>
 				</li>
 				<li>
-					<a href="file-manager.html">
-						<div class="parent-icon"><i class="bx bx-cog"></i>
+					<a class="has-arrow" href="javascript:;">
+						<div class="parent-icon">
+							<i class="bx bx-list-ul"></i>
 						</div>
 						<div class="menu-title">Settings</div>
 					</a>
+					<ul>
+						<li> <a href="changeroot.html"><i class="bx bx-settings"></i>Change root password</a>
+						</li>
+						<li> <a href="camerasettings.html"><i class="bx bx-settings"></i>Camera Settings</a>
+						</li>
+					</ul>
 				</li>
 				<li>
 					<a href="api.html">
@@ -91,9 +99,8 @@ def MenuView():
 							</a>
 
 						</li>
-						<li class="nav-item dropdown dropdown-language">
-							<a class="nav-link dropdown-toggle dropdown-toggle-nocaret" href="javascript:;"
-								data-toggle="dropdown">
+						<li class="nav-item  dropdown-language">
+							<a class="nav-link" href="/login.html">
 								<div class="lang d-flex">
 									<div>
 										<i class="bx bx-log-out"></i>

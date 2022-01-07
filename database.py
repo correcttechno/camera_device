@@ -116,3 +116,19 @@ def getToken(url):
     sql="select value from settings where key='login_token'"
     result=SQLquery(sql)
     return url+"?token="+result.fetchone()[0]
+
+def setRootPassword(password,token):
+    sql="select value from settings where key='login_token'"
+    result=SQLquery(sql)
+    mytoken=result.fetchone()[0]
+    if(token==mytoken):
+        sql="update settings set value='"+password+"' where key='login_password'"
+        SQLquery(sql)
+        return True
+    else:
+        return False
+
+def setNewToken():
+    uid=round(random.random()*100000)
+    sql="update settings set value='"+str(uid)+"' where key='login_token'"
+    SQLquery(sql)
