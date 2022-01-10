@@ -119,7 +119,7 @@ def StartCamera(callback):
     for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
     #while True:
         key = cv2.waitKey(1) & 0xFF
-        ret, rawCapture = camera.read()
+        #ret, rawCapture = camera.read()
         #RealTimeImage=rawCapture
         
         #ScanImage = frame.array
