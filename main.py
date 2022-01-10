@@ -18,6 +18,7 @@ import database
 from network import checkNetwork 
 import textfilter
 from views.apiView import ApiView
+from views.camerasettingsView import CameraSettingsView
 from views.changerootView import ChangeRootView
 
 from views.homeView import HomeView
@@ -216,6 +217,14 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
             self.wfile.write(content)
         elif self.path == database.getToken('/changeroot.html'):
             PAGE=ChangeRootView()
+            content = PAGE.encode('utf-8')
+            self.send_response(200)
+            self.send_header('Content-Type', 'text/html')
+            self.send_header('Content-Length', len(content))
+            self.end_headers()
+            self.wfile.write(content)
+        elif self.path == database.getToken('/camerasettings.html'):
+            PAGE=CameraSettingsView()
             content = PAGE.encode('utf-8')
             self.send_response(200)
             self.send_header('Content-Type', 'text/html')
