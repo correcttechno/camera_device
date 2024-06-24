@@ -9,10 +9,10 @@ import socketserver
 import base64
 import json
 from websocket_server import WebsocketServer
-from camera import StartCamera,changeDisplay
+from camera import StartCamera
 from http import server
 import cgi
-#import RPi.GPIO as GPIO
+import Jetson.GPIO as GPIO
 import threading
 import database
 from network import checkNetwork 
@@ -26,11 +26,13 @@ from views.loginView import LoginView
 from views.whitelistView import WhitelistView
 from views.whitelistaddView import WhitelistaddView
 
-RELAY_PIN=23
 #GPIO.setmode(GPIO.BCM)
 #GPIO.setup(RELAY_PIN, GPIO.OUT)
+#rtsp://admin:88888888a@192.168.16.64:554/Streaming/Channels/101
 
-
+GPIO.setmode(GPIO.BOARD)
+RELAY_PIN = 29
+GPIO.setup(RELAY_PIN, GPIO.OUT)
           
 
 CroppedImage=None
@@ -76,9 +78,9 @@ def myfun(image,cropped,text,realtime):
         network=checkNetwork(ScreenText,ScreenImage,CroppedImage)
         if((result or network)  and ScreenText!=OpenedText):
             ScreenTextStatus=True
-            #GPIO.output(RELAY_PIN, GPIO.HIGH)
+            GPIO.output(RELAY_PIN, GPIO.HIGH)
             time.sleep(0.5)
-            #GPIO.output(RELAY_PIN, GPIO.LOW)
+            GPIO.output(RELAY_PIN, GPIO.LOW)
             OpenedText=ScreenText
         elif result:
             ScreenTextStatus=True

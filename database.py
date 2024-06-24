@@ -8,7 +8,7 @@ import random
 
 def SQLquery(sql):
     
-    con = sqlite3.connect('database/database.db')
+    con = sqlite3.connect('/home/msb/camera_software/database/database.db')
     
     cur = con.cursor()
     cur.execute(sql)
